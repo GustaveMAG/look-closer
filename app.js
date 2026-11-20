@@ -21,8 +21,8 @@
       ch1: 'Les chasseurs', ch2: 'L’auberge', ch3: 'L’oiseau caché', ch4: 'La vallée gelée', ch5: 'La cheminée', ch6: 'Les montagnes',
 
       m_hello: 'Bonjour. Je suis « Chasseurs dans la neige ». Pieter Bruegel l’Ancien m’a peint en 1565.',
-      m_series: 'Je fais partie d’une série de six tableaux sur les moments de l’année, peints pour Niclaes Jonghelinck, un collectionneur d’Anvers. Cinq existent encore. Moi, je suis l’hiver.',
-      m_secrets: 'La plupart des gens passent devant moi en quelques secondes. Pourtant, je cache des dizaines d’histoires. Je te les montre ?',
+      m_series: 'Je fais partie d’une série de six tableaux sur les moments de l’année, peints pour un collectionneur d’Anvers. Moi, je suis l’hiver.',
+      m_secrets: 'On passe souvent devant moi en quelques secondes. Pourtant, je cache des dizaines d’histoires. Je te les montre ?',
       c_go: 'Oui, montre-moi', c_next: 'Continuer',
 
       m_h1: 'Regarde en bas à gauche : trois chasseurs rentrent au village avec leurs chiens. Ils avancent lourdement dans la neige épaisse.',
@@ -84,8 +84,8 @@
       ch1: 'The hunters', ch2: 'The inn', ch3: 'The hidden bird', ch4: 'The frozen valley', ch5: 'The chimney', ch6: 'The mountains',
 
       m_hello: 'Hello. I’m “The Hunters in the Snow”. Pieter Bruegel the Elder painted me in 1565.',
-      m_series: 'I belong to a series of six paintings about the times of the year, made for Niclaes Jonghelinck, a collector in Antwerp. Five still exist. I am winter.',
-      m_secrets: 'Most people walk past me in a few seconds. Yet I hide dozens of stories. Shall I show you?',
+      m_series: 'I belong to a series of six paintings about the times of the year, made for a collector in Antwerp. I am winter.',
+      m_secrets: 'People often walk past me in a few seconds. Yet I hide dozens of stories. Shall I show you?',
       c_go: 'Yes, show me', c_next: 'Continue',
 
       m_h1: 'Look at the bottom left: three hunters are coming back to the village with their dogs. They trudge wearily through the deep snow.',
@@ -310,12 +310,12 @@
       state.log = state.log.filter(function (e) { return e.cls !== 'fb'; });
       chat.querySelectorAll('.fb').forEach(function (el) { el.remove(); });
     }
-    state.log.push(entry); chat.appendChild(msgEl(entry)); scrollChat();
+    state.log.push(entry); chat.appendChild(msgEl(entry)); fitText(); scrollChat();
   }
   function renderChat() {
     chat.innerHTML = '';
     state.log.forEach(function (e) { var m = msgEl(e); m.style.animation = 'none'; chat.appendChild(m); });
-    scrollChat();
+    fitText(); scrollChat();
   }
   function choices(list) { state.choices = list; renderChoices(); }
   function renderChoices() {
@@ -330,22 +330,26 @@
       });
       actionsEl.appendChild(b);
     });
+    fitText();
   }
   function next(fn) { choices([['c_next', fn]]); }
   // Attente annulée si l'utilisateur recommence entre-temps.
   function wait(ms) { var run = state.run; return new Promise(function (res, rej) { setTimeout(function () { run === state.run ? res() : rej('reset'); }, ms); }); }
   function guard(p) { return p.catch(function () {}); }
-  // Affiche une suite de messages, chacun après un temps de lecture proportionnel au précédent.
+  // Affiche tout le texte d'un coup, puis ajuste sa taille pour qu'il tienne sans défiler.
   function say(keys, then) {
-    var i = 0;
-    function step() {
-      add('art', keys[i]);
-      var len = t(keys[i]).length; i++;
-      if (i < keys.length) return wait(Math.min(3400, 900 + len * 22)).then(step);
-      return wait(700).then(function () { if (then) then(); });
-    }
-    return guard(step());
+    keys.forEach(function (k) { add('art', k); });
+    if (then) then();
   }
+  var FONT_MAX = MODE === 'presenter' ? 17 : 21, FONT_MIN = 13;
+  function fitText() {
+    if (state.view !== 'v-talk') return;
+    var size = FONT_MAX;
+    chat.style.fontSize = size + 'px';
+    while (chat.scrollHeight > chat.clientHeight + 1 && size > FONT_MIN) { size -= .5; chat.style.fontSize = size + 'px'; }
+  }
+  window.addEventListener('resize', fitText);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitText);
 
   /* ================= Chrono ================= */
   function fmt(s) { return Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0'); }
@@ -370,13 +374,8 @@
   }
   // 2. L'auberge et son enseigne
   function chInn() {
-    setChapter(2); zoomTo(P.inn); state.found.push('f_inn');
-    add('art', 'm_i1');
-    guard(wait(2600).then(function () {
-      ring(P.sign, .085, P.inn.k);
-      add('art', 'm_i2');
-      return wait(1800);
-    }).then(function () { next(chBird); }));
+    setChapter(2); zoomTo(P.inn); ring(P.sign, .085, P.inn.k); state.found.push('f_inn');
+    say(['m_i1', 'm_i2'], function () { next(chBird); });
   }
   // 3. Le jeu : l'oiseau caché
   function chBird() {
@@ -390,16 +389,13 @@
     state.found.push('f_bird');
     state.log = state.log.filter(function (e) { return e.cls !== 'fb'; }); chat.querySelectorAll('.fb').forEach(function (el) { el.remove(); });
     add('me', 'me_found', 'found');
-    guard(wait(700).then(function () { say(['m_birdStory'], function () { next(chValley); }); }));
+    say(['m_birdStory'], function () { next(chValley); });
   }
-  // 4. La vallée gelée et le moulin
+  // 4. La vallée gelée et le moulin (le zoom glisse des étangs vers le moulin)
   function chValley() {
     clearRings(); setChapter(4); zoomTo(P.pond); state.found.push('f_mill');
-    add('art', 'm_p1');
-    guard(wait(3200).then(function () {
-      zoomTo(P.mill); add('art', 'm_p2');
-      return wait(1500);
-    }).then(function () { next(chChimney); }));
+    say(['m_p1', 'm_p2'], function () { next(chChimney); });
+    guard(wait(2800).then(function () { if (state.chapter === 4) zoomTo(P.mill); }));
   }
   // 5. La question de la cheminée
   function chChimney() {
@@ -415,11 +411,7 @@
   // 6. Les montagnes, et la fin
   function chAlps() {
     clearRings(); setChapter(6); zoomTo(P.alps); state.found.push('f_alps'); setStep(4);
-    add('art', 'm_m1');
-    guard(wait(3000).then(function () {
-      zoomOut(); add('art', 'm_m2');
-      return wait(1800);
-    }).then(function () { choices([['c_time', finish]]); }));
+    say(['m_m1', 'm_m2'], function () { choices([['c_time', finish]]); });
   }
 
   function finish() {

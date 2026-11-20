@@ -69,10 +69,11 @@ button { font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-c
 .segs span { height: 3px; background: var(--line); transition: background .4s; }
 .segs span.done { background: var(--ink); }
 .segs span.cur { background: var(--accent); }
-.story { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: 6px 20px 16px; }
-.para { margin: 0 0 14px; font-size: 20px; line-height: 1.42; letter-spacing: -.012em; max-width: 30em; text-wrap: pretty; animation: rise .45s ease both; }
-.para.fb { font-size: 17px; border-left: 2px solid var(--accent); padding-left: 12px; }
-.reply { margin: 2px 0 16px; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); animation: rise .3s ease both; }
+.story { flex: 1; min-height: 0; font-size: 21px; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: 6px 20px 16px; }
+.para { margin: 0 0 .7em; font-size: 1em; line-height: 1.4; letter-spacing: -.012em; max-width: 30em; text-wrap: pretty; animation: rise .45s ease both; }
+.story > :last-child { margin-bottom: 0; }
+.para.fb { font-size: .85em; border-left: 2px solid var(--accent); padding-left: 12px; }
+.reply { margin: 0 0 .9em; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); animation: rise .3s ease both; }
 .reply::before { content: "→ "; }
 .reply.found { color: var(--accent); }
 @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
@@ -84,7 +85,6 @@ button { font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-c
 .chip.primary::after { content: "→"; font-weight: 400; }
 .chip.primary:active { background: #333; }
 @media (max-height: 700px) {
-  .para { font-size: 18px; margin-bottom: 12px; }
   .chap { padding-top: 12px; gap: 10px; }
   .chip, .chip.primary { min-height: 50px; }
 }
@@ -115,6 +115,5 @@ button { font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-c
   .visitor .talk { display: grid; grid-template-columns: 58% 1fr; grid-template-rows: auto 1fr auto; }
   .visitor .talk .art { grid-row: 1 / 4; align-self: center; }
   .visitor .talk .chap, .visitor .talk .story, .visitor .talk .actions { grid-column: 2; }
-  .visitor .para { font-size: 17px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
