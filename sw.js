@@ -1,8 +1,8 @@
 /* Look Closer — service worker : garde le site en mémoire sur le téléphone.
    Pages : réseau d'abord (toujours la dernière version), copie locale si la connexion tombe.
    Fichiers versionnés et images : copie locale d'abord (chargement instantané). */
-var CACHE = 'look-closer-v6';
-var CORE = ['./', './index.html', './app.js?v=6', './style.css?v=6', './img/bruegel-1600.jpg', './manifest.webmanifest', './icons/icon-192.png'];
+var CACHE = 'look-closer-v7';
+var CORE = ['./', './index.html', './artworks.js?v=7', './app.js?v=7', './style.css?v=7', './img/bruegel-1600.jpg', './manifest.webmanifest', './icons/icon-192.png'];
 
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(CORE); }).then(function () { return self.skipWaiting(); }));

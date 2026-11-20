@@ -9,3 +9,10 @@
 Site statique (HTML/CSS/JS), sans compte ni collecte de données.
 
 Œuvre : Pieter Bruegel l'Ancien, *Chasseurs dans la neige* (1565), Kunsthistorisches Museum, Vienne. Image via Wikimedia Commons, domaine public. Les textes s'appuient sur les notices Wikipédia du tableau. Démo sans lien avec le musée.
+
+## Œuvres
+Chaque œuvre a son propre lien (un QR code par tableau) :
+- Bruegel, *Chasseurs dans la neige* (par défaut) : `?art=hunters`
+- Holbein, *Les Ambassadeurs* : `?art=ambassadors`
+
+Les textes, la visite et les détails de chaque œuvre sont dans `artworks.js`.

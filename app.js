@@ -1,156 +1,57 @@
 /* Look Closer — l'expérience visiteur, partagée par index.html (plein écran)
    et presenter.html (dans un cadre de téléphone).
-   Œuvre : Pieter Bruegel l'Ancien, Chasseurs dans la neige (1565), domaine public.
+   Les œuvres (textes, visite, détails) sont décrites dans artworks.js ; ?art=identifiant choisit l'œuvre.
    Aucune donnée n'est envoyée nulle part : tout se passe dans le navigateur. */
 (function () {
   'use strict';
 
-  /* ================= Textes FR / EN =================
-     Les faits sur l'œuvre viennent des notices Wikipédia (FR et EN) du tableau. */
+  /* ================= Textes de l'interface, FR / EN ================= */
   var T = {
     fr: {
-      htmlLang: 'fr', langLabel: 'Langue',
-      status: 'Salle 4',
-      artist: 'Pieter Bruegel l’Ancien', title: 'Chasseurs dans la neige', date: '1565',
-      meta: 'Huile sur bois, 117 × 162 cm<br>Kunsthistorisches Museum, Vienne',
-      imgAlt: 'Chasseurs dans la neige, Pieter Bruegel l’Ancien, 1565 : trois chasseurs et leurs chiens rentrent au village enneigé, en contrebas des patineurs sur des étangs gelés.',
+      htmlLang: 'fr', langLabel: 'Langue', status: 'Salle 4',
       start: 'Commencer la visite', startScan: 'Scanner le QR code',
       hintStart: '6 détails à découvrir · environ 3 minutes · sans appli, sans compte',
       hintPresenter: 'Sans appli · sur votre propre téléphone',
-      tagGo: 'Touchez l’oiseau', who: 'L’œuvre', intro: 'Introduction', chapter: 'Chapitre',
-      ch1: 'Les chasseurs', ch2: 'L’auberge', ch3: 'L’oiseau caché', ch4: 'La vallée gelée', ch5: 'La cheminée', ch6: 'Les montagnes',
-
-      m_hello: 'Bonjour. Je suis « Chasseurs dans la neige ». Pieter Bruegel l’Ancien m’a peint en 1565.',
-      m_series: 'Je fais partie d’une série de six tableaux sur les moments de l’année, peints pour un collectionneur d’Anvers. Moi, je suis l’hiver.',
-      m_secrets: 'On passe souvent devant moi en quelques secondes. Pourtant, je cache des dizaines d’histoires. Je te les montre ?',
-      c_go: 'Oui, montre-moi', c_next: 'Continuer',
-
-      m_h1: 'Regarde en bas à gauche : trois chasseurs rentrent au village avec leurs chiens. Ils avancent lourdement dans la neige épaisse.',
-      m_h2: 'Leur butin ? Un seul renard, bien maigre. Les chiens aussi ont l’air affamés. La chasse a été mauvaise.',
-
-      m_i1: 'Juste à côté, devant l’auberge, des adultes et un enfant ont allumé un grand feu. Ils s’apprêtent à griller un cochon.',
-      m_i2: 'Lève les yeux : l’enseigne de l’auberge pend, presque décrochée. Elle représente saint Hubert, ou saint Eustache, le patron des chasseurs. Ironique, pour des chasseurs qui rentrent presque bredouilles…',
-
-      m_askBird: 'À toi de jouer. Tu vois l’oiseau noir caché dans le ciel ? Il est en plein vol. Touche-le sur le tableau.',
-      m_crow: 'Bien vu, c’est une corneille. Mais il y a un autre oiseau, en plein vol, au-dessus de la vallée.',
-      m_miss1: 'Pas là… Cherche dans le ciel, au-dessus de la vallée.',
-      m_miss2: 'Presque ! Regarde à droite, entre les arbres et les montagnes.',
-      m_miss3: 'Je t’aide : il est dans le cercle rouge. Touche-le !',
-      me_found: 'Trouvé',
-      m_birdStory: 'C’est une pie. Avec les corneilles posées dans les arbres, on y lit souvent un mauvais présage : à l’époque, aux Pays-Bas, la pie était associée au diable.',
-
-      m_p1: 'Descends dans la vallée. Sur les étangs gelés, tout le village s’amuse : on patine, on joue à un ancêtre du hockey, et à l’eisstock, un cousin du curling.',
-      m_p2: 'Plus bas, à droite, la roue du moulin à eau est prise dans la glace. Elle ne tourne plus.',
-
-      m_askSmoke: 'Une question. Regarde les maisons près de l’église : une cheminée a un problème. Que se passe-t-il ?',
-      c_fire: 'Elle est en feu', c_fall: 'Elle s’est effondrée', c_smoke: 'Elle fume, c’est tout',
-      m_smokeOk: 'Exactement : un feu de cheminée. Pendant que les uns patinent, d’autres ont un vrai souci.',
-      m_smokeNo: 'Regarde de plus près : la cheminée est en feu. Pendant que les uns patinent, d’autres ont un vrai souci.',
-
-      m_m1: 'Et ces montagnes pointues, au fond ? Il n’y en a pas en Flandre ! Bruegel avait traversé les Alpes pendant son voyage en Italie.',
-      m_m2: 'Quatre siècles plus tard, le cinéaste Andreï Tarkovski m’a filmé longuement dans « Solaris » (1972). Tu sais maintenant pourquoi : plus on me regarde, plus j’en raconte.',
-      c_time: 'Voir mon temps de regard',
-      c_show: 'Montre-moi',
+      intro: 'Introduction', chapter: 'Chapitre',
+      c_go: 'Oui, montre-moi', c_next: 'Continuer', c_time: 'Voir mon temps de regard', c_show: 'Montre-moi', me_found: 'Trouvé',
+      sideView: 'Vu de côté · simulation',
       explore: 'Explorer le tableau', close: 'Fermer', exHint: 'Pincez pour zoomer · touchez un numéro',
-      h_hunters: 'Les chasseurs', h_fire: 'Le feu', h_sign: 'L’enseigne', h_bird: 'La pie', h_pond: 'Les patineurs', h_mill: 'Le moulin gelé', h_smoke: 'La cheminée en feu', h_alps: 'Les montagnes',
-      x_hunters: 'Trois chasseurs rentrent au village avec leurs chiens, fatigués. Leur seul butin : un renard bien maigre.',
-      x_fire: 'Devant l’auberge, des adultes et un enfant ont allumé un grand feu pour griller un cochon.',
-      x_sign: 'L’enseigne pend, presque décrochée. Elle représente saint Hubert, ou saint Eustache, patron des chasseurs.',
-      x_bird: 'Une pie en plein vol. Avec les corneilles, on y lit souvent un mauvais présage : à l’époque, la pie était associée au diable.',
-      x_pond: 'Sur les étangs gelés, on patine, on joue à un ancêtre du hockey et à l’eisstock, un cousin du curling.',
-      x_mill: 'La roue du moulin à eau est prise dans la glace. Elle ne tourne plus.',
-      x_smoke: 'Près de l’église, un feu de cheminée. Pendant que les uns patinent, d’autres ont un vrai souci.',
-      x_alps: 'Des montagnes pointues qui n’existent pas en Flandre : Bruegel avait traversé les Alpes pendant son voyage en Italie.',
-
       endLead: 'Votre temps de regard',
       ratio: function (r) { return 'Soit ' + r + ' fois plus que la moyenne des visiteurs.'; },
       ratioLow: 'Un visiteur reste en moyenne 28 secondes devant une œuvre. Prenez votre temps.',
-      avg: 'Moyenne 0:28', you: 'Vous',
-      foundLead: 'Ce que vous avez vu',
-      f_hunters: 'Les trois chasseurs et leur maigre renard', f_inn: 'L’enseigne du patron des chasseurs', f_bird: 'La pie en plein vol',
-      f_mill: 'Le moulin pris dans la glace', f_smoke: 'Le feu de cheminée', f_alps: 'Des montagnes venues des Alpes',
+      avg: 'Moyenne 0:28', you: 'Vous', foundLead: 'Ce que vous avez vu',
       nightKicker: 'Bientôt', nightTitle: 'Édition de nuit', nightText: 'Le 1er vendredi du mois, les œuvres vous donnent des indices pour un jeu en équipe. Venez entre amis.',
-      again: 'Recommencer', next: 'Œuvre suivante',
-      credit: 'Image : Kunsthistorisches Museum, Vienne, via Wikimedia Commons (domaine public). Démo Artthropic, sans lien avec le musée. Aucun compte, aucune donnée collectée.',
+      again: 'Recommencer', nextArt: 'Œuvre suivante',
       restart: 'Recommencer la démo',
       quote: 'Et si, pour une fois, c’était l’œuvre qui vous posait la question ?',
       s1t: 'Je scanne', s1p: 'Un QR code sur le cartel. Pas d’appli à télécharger, mon propre téléphone suffit.',
-      s2t: 'L’œuvre me raconte son histoire', s2p: 'Détail par détail, le tableau zoome sur ce dont elle parle : les chasseurs, l’auberge, son enseigne.',
-      s3t: 'Elle me pose une question', s3p: '« Tu vois l’oiseau noir caché ? » Je cherche le détail et je touche le tableau pour répondre.',
+      s2t: 'L’œuvre me raconte son histoire', s2p: 'Détail par détail, le tableau zoome sur ce dont elle parle.',
+      s3t: 'Elle me pose une question', s3p: 'Je cherche le détail caché et je touche le tableau pour répondre.',
       s4t: 'Je découvre ses secrets', s4p: 'Chaque réponse débloque un secret, écrit et validé par les conservateurs.',
       s5t: 'Je regarde vraiment', s5p: 'Mon temps de regard comparé aux 28 secondes de moyenne. Objectif du pilote : 2 minutes.',
       tryIt: 'Essayez sur votre téléphone',
       note: 'Prototype de démonstration. Les textes sont écrits à l’avance, comme le seraient des textes validés par un musée.'
     },
     en: {
-      htmlLang: 'en', langLabel: 'Language',
-      status: 'Room 4',
-      artist: 'Pieter Bruegel the Elder', title: 'The Hunters in the Snow', date: '1565',
-      meta: 'Oil on panel, 117 × 162 cm<br>Kunsthistorisches Museum, Vienna',
-      imgAlt: 'The Hunters in the Snow, Pieter Bruegel the Elder, 1565: three hunters and their dogs return to a snowy village, above skaters on frozen ponds.',
+      htmlLang: 'en', langLabel: 'Language', status: 'Room 4',
       start: 'Start the tour', startScan: 'Scan the QR code',
       hintStart: '6 details to discover · about 3 minutes · no app, no account',
       hintPresenter: 'No app · on your own phone',
-      tagGo: 'Tap the bird', who: 'The artwork', intro: 'Introduction', chapter: 'Chapter',
-      ch1: 'The hunters', ch2: 'The inn', ch3: 'The hidden bird', ch4: 'The frozen valley', ch5: 'The chimney', ch6: 'The mountains',
-
-      m_hello: 'Hello. I’m “The Hunters in the Snow”. Pieter Bruegel the Elder painted me in 1565.',
-      m_series: 'I belong to a series of six paintings about the times of the year, made for a collector in Antwerp. I am winter.',
-      m_secrets: 'People often walk past me in a few seconds. Yet I hide dozens of stories. Shall I show you?',
-      c_go: 'Yes, show me', c_next: 'Continue',
-
-      m_h1: 'Look at the bottom left: three hunters are coming back to the village with their dogs. They trudge wearily through the deep snow.',
-      m_h2: 'Their catch? A single, scrawny fox. The dogs look hungry too. The hunt went badly.',
-
-      m_i1: 'Right next to them, in front of the inn, some adults and a child have lit a big fire. They are about to singe a pig.',
-      m_i2: 'Look up: the inn sign is hanging, almost falling off. It shows Saint Hubert, or Saint Eustace, the patron saint of hunters. Ironic, for hunters coming home almost empty-handed…',
-
-      m_askBird: 'Your turn. Can you see the black bird hidden in the sky? It’s in mid-flight. Tap it on the painting.',
-      m_crow: 'Good eye, that’s a crow. But there’s another bird, in mid-flight, above the valley.',
-      m_miss1: 'Not there… Look in the sky, above the valley.',
-      m_miss2: 'Almost! Look to the right, between the trees and the mountains.',
-      m_miss3: 'Here’s a hint: it’s inside the red circle. Tap it!',
-      me_found: 'Found it',
-      m_birdStory: 'It’s a magpie. Together with the crows in the trees, it is often read as a bad omen: in the Low Countries back then, the magpie was linked to the Devil.',
-
-      m_p1: 'Go down into the valley. On the frozen ponds the whole village is having fun: skating, playing an early form of hockey, and eisstock, a cousin of curling.',
-      m_p2: 'Further down, on the right, the watermill’s wheel is caught in the ice. It no longer turns.',
-
-      m_askSmoke: 'A question. Look at the houses near the church: one chimney has a problem. What is happening?',
-      c_fire: 'It’s on fire', c_fall: 'It has collapsed', c_smoke: 'It’s just smoking',
-      m_smokeOk: 'Exactly: a chimney fire. While some people skate, others have a real problem.',
-      m_smokeNo: 'Look closer: the chimney is on fire. While some people skate, others have a real problem.',
-
-      m_m1: 'And those jagged mountains in the distance? There are none in Flanders! Bruegel had crossed the Alps on his journey to Italy.',
-      m_m2: 'Four centuries later, the film-maker Andrei Tarkovsky lingered on me in “Solaris” (1972). Now you know why: the longer you look at me, the more I tell.',
-      c_time: 'See my looking time',
-      c_show: 'Show me',
+      intro: 'Introduction', chapter: 'Chapter',
+      c_go: 'Yes, show me', c_next: 'Continue', c_time: 'See my looking time', c_show: 'Show me', me_found: 'Found it',
+      sideView: 'Seen from the side · simulation',
       explore: 'Explore the painting', close: 'Close', exHint: 'Pinch to zoom · tap a number',
-      h_hunters: 'The hunters', h_fire: 'The fire', h_sign: 'The inn sign', h_bird: 'The magpie', h_pond: 'The skaters', h_mill: 'The frozen mill', h_smoke: 'The chimney fire', h_alps: 'The mountains',
-      x_hunters: 'Three weary hunters return to the village with their dogs. Their only catch: a scrawny fox.',
-      x_fire: 'In front of the inn, some adults and a child have lit a big fire to singe a pig.',
-      x_sign: 'The sign is hanging, almost falling off. It shows Saint Hubert, or Saint Eustace, the patron saint of hunters.',
-      x_bird: 'A magpie in mid-flight. With the crows, it is often read as a bad omen: back then, the magpie was linked to the Devil.',
-      x_pond: 'On the frozen ponds, people skate and play an early form of hockey and eisstock, a cousin of curling.',
-      x_mill: 'The watermill’s wheel is caught in the ice. It no longer turns.',
-      x_smoke: 'Near the church, a chimney fire. While some people skate, others have a real problem.',
-      x_alps: 'Jagged mountains that do not exist in Flanders: Bruegel had crossed the Alps on his journey to Italy.',
-
       endLead: 'Your looking time',
       ratio: function (r) { return 'That’s ' + r + ' times longer than the average visitor.'; },
       ratioLow: 'The average visitor spends 28 seconds in front of an artwork. Take your time.',
-      avg: 'Average 0:28', you: 'You',
-      foundLead: 'What you saw',
-      f_hunters: 'The three hunters and their scrawny fox', f_inn: 'The sign of the hunters’ patron saint', f_bird: 'The magpie in mid-flight',
-      f_mill: 'The mill caught in the ice', f_smoke: 'The chimney fire', f_alps: 'Mountains borrowed from the Alps',
+      avg: 'Average 0:28', you: 'You', foundLead: 'What you saw',
       nightKicker: 'Coming soon', nightTitle: 'Night edition', nightText: 'On the first Friday of the month, the artworks give you clues for a team game. Come with friends.',
-      again: 'Start again', next: 'Next artwork',
-      credit: 'Image: Kunsthistorisches Museum, Vienna, via Wikimedia Commons (public domain). Artthropic demo, not affiliated with the museum. No account, no data collected.',
+      again: 'Start again', nextArt: 'Next artwork',
       restart: 'Restart the demo',
       quote: 'What if, for once, it was the artwork asking you the question?',
       s1t: 'I scan', s1p: 'A QR code on the label. No app to download, my own phone is enough.',
-      s2t: 'The artwork tells me its story', s2p: 'Detail by detail, the painting zooms in on what it talks about: the hunters, the inn, its sign.',
-      s3t: 'It asks me a question', s3p: '“Can you see the hidden black bird?” I look for the detail and tap the painting to answer.',
+      s2t: 'The artwork tells me its story', s2p: 'Detail by detail, the painting zooms in on what it talks about.',
+      s3t: 'It asks me a question', s3p: 'I look for the hidden detail and tap the painting to answer.',
       s4t: 'I discover its secrets', s4p: 'Each answer unlocks a secret, written and checked by the curators.',
       s5t: 'I really look', s5p: 'My looking time compared with the 28-second average. Pilot goal: 2 minutes.',
       tryIt: 'Try it on your phone',
@@ -158,27 +59,20 @@
     }
   };
 
-  var MODE = document.body.getAttribute('data-mode') === 'presenter' ? 'presenter' : 'visitor';
-  var AVG = 28, CHAPTERS = 6;
-  var RATIO = 3840 / 2733;               // largeur / hauteur du tableau
-  var IMG = 'img/bruegel-1600.jpg', IMG_HD = 'img/bruegel-3200.jpg';
-  var LQIP = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAARABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDEMDyNBM0bKroQXPAJxWjbacGAbfGcoGyT2PWmPbxwakljpe66liLkuSj5UDlQMdTyOa1YtM1e0t1lnihnMka/KnyuOBwwzjAxyRk+1Y62KcUV49PjI4Yu4J4AI/AetFQWl0sqTRtJcJLjgQgt0OGHPFFC8xcqOm0H/UR/78n8zTNe/wCPu2/H+YooqGaIr3P/ACGLT6n+VFFFUQz/2Q==';
-  // Positions en fraction de l'image (x de 0 à 1 sur la largeur, y de 0 à 1 sur la hauteur).
-  var P = {
-    hunters: { x: .33, y: .70, k: 2.2 },
-    inn: { x: .12, y: .48, k: 2.4 },
-    sign: { x: .104, y: .3825 },
-    magpie: { x: .7116, y: .2623 },
-    pond: { x: .79, y: .60, k: 2.4 },
-    mill: { x: .9386, y: .821, k: 3 },
-    chimney: { x: .6847, y: .4167 },
-    alps: { x: .87, y: .22, k: 2.2 }
-  };
-  var CROWS = [[.235, .073], [.569, .187], [.499, .596], [.591, .712]];
-  var HIT_MAGPIE = .085, HIT_CROW = .04;  // rayons de touche, en fraction de la largeur
+  /* ================= Œuvre choisie ================= */
+  var LIB = window.LC_ARTWORKS;
+  var query = function (name) { var m = new RegExp('[?&]' + name + '=([a-z]+)').exec(location.search); return m ? m[1] : null; };
+  var ART_ID = LIB.list[query('art')] ? query('art') : LIB.order[0];
+  var ART = LIB.list[ART_ID];
+  var NEXT_ART = LIB.order[(LIB.order.indexOf(ART_ID) + 1) % LIB.order.length];
+  var TOUR = ART.tour, CHAPTERS = TOUR.length;
 
-  var lang = (function () { var m = /[?&]lang=(fr|en)\b/.exec(location.search); return m ? m[1] : 'fr'; })();
-  var t = function (k) { return T[lang][k]; };
+  var MODE = document.body.getAttribute('data-mode') === 'presenter' ? 'presenter' : 'visitor';
+  var AVG = 28, RATIO = ART.ratio;
+  var LQIP = 'data:image/jpeg;base64,' + ART.lqip;
+  var lang = query('lang') === 'en' ? 'en' : 'fr';
+  var t = function (k) { var a = ART.text[lang]; return (a && a[k] !== undefined) ? a[k] : T[lang][k]; };
+  document.documentElement.style.setProperty('--ratio', RATIO);
 
   /* ================= Interface ================= */
   var host = document.getElementById('app');
@@ -190,7 +84,7 @@
   host.innerHTML =
     '<div class="lc">' + top +
     '<section class="view welcome" id="v-scan">' +
-      '<div class="art"><div class="frame" style="background-image:url(' + LQIP + ')"><img data-src="' + IMG + '" data-i18n-alt="imgAlt" decoding="async"></div></div>' +
+      '<div class="art"><div class="frame" style="background-image:url(' + LQIP + ')"><img data-src="' + ART.img + '" data-i18n-alt="imgAlt" decoding="async"></div></div>' +
       '<div class="cartel"><span class="artist" data-i18n="artist"></span><span class="title"><i data-i18n="title"></i>, <span data-i18n="date"></span></span>' +
         '<span class="meta" data-i18n-html="meta"></span></div>' +
       '<div class="cta">' +
@@ -199,7 +93,8 @@
       '</div>' +
     '</section>' +
     '<section class="view talk" id="v-talk" hidden>' +
-      '<div class="art" id="art"><div class="frame" id="frame" style="background-image:url(' + LQIP + ')"><img id="paintImg" data-src="' + IMG + '" data-i18n-alt="imgAlt" decoding="async"></div>' +
+      '<div class="art" id="art"><div class="frame" id="frame" style="background-image:url(' + LQIP + ')"><img id="paintImg" data-src="' + ART.img + '" data-i18n-alt="imgAlt" decoding="async"></div>' +
+        '<div class="morph" id="morph" hidden><img id="morphImg" alt=""><span class="label" data-i18n="sideView"></span></div>' +
         '<span class="tag" id="tag" hidden></span><span class="timer" id="timer">0:00</span></div>' +
       '<div class="chap"><div class="segs" id="segs" aria-hidden="true">' + new Array(CHAPTERS + 1).join('<span></span>') + '</div>' +
         '<span class="label" id="kicker"></span></div>' +
@@ -213,7 +108,8 @@
       '<div><span class="label" data-i18n="foundLead"></span><div class="found-list" id="foundList" style="margin-top:10px"></div></div>' +
       '<div class="night"><span class="label" data-i18n="nightKicker"></span><b data-i18n="nightTitle"></b><span data-i18n="nightText"></span></div>' +
       '<div class="end-cta"><button class="btn" id="exploreBtn" type="button" data-i18n="explore"></button>' +
-      '<button class="btn ghost" id="nextBtn" type="button" data-i18n="' + (MODE === 'presenter' ? 'next' : 'again') + '"></button></div>' +
+      '<button class="btn ghost" id="nextArtBtn" type="button" data-i18n="nextArt"></button>' +
+      '<button class="linkbtn" id="nextBtn" type="button" data-i18n="again"></button></div>' +
       '<p class="credit" data-i18n="credit"></p>' +
     '</section>' +
     '<section class="view explore" id="v-explore" hidden>' +
@@ -238,19 +134,19 @@
     var c = navigator.connection;
     if (c && (c.saveData || /(^|-)2g$/.test(c.effectiveType || ''))) return;
     var hd = new Image();
-    hd.onload = function () { $('paintImg').src = IMG_HD; };
-    hd.src = IMG_HD;
+    hd.onload = function () { $('paintImg').src = ART.hd; };
+    hd.src = ART.hd;
+    if (ART.morph) { var m = new Image(); m.src = ART.morph.img; }
   }
 
   var state;
-  function freshState() { return { step: 0, start: 0, tick: null, found: [], phase: 'idle', chapter: 0, log: [], choices: [], final: 0, view: 'v-scan', run: 0 }; }
+  function freshState() { return { step: 0, start: 0, tick: null, found: [], phase: 'idle', chapter: 0, ci: -1, log: [], choices: [], final: 0, view: 'v-scan', run: 0 }; }
   state = freshState();
 
   /* ================= Traduction ================= */
   function setTag() {
     var tag = $('tag');
-    if (state.phase === 'bird') { tag.textContent = t('tagGo'); tag.classList.add('go'); tag.hidden = false; }
-    else tag.hidden = true;
+    tag.textContent = t('tagGo'); tag.classList.add('go'); tag.hidden = state.phase !== 'tap';
   }
   function applyStatic() {
     document.documentElement.lang = t('htmlLang');
@@ -310,22 +206,35 @@
   function clearRings() { frame.querySelectorAll('.ring').forEach(function (r) { r.remove(); }); }
   function dist(a, bx, by) { var dx = a.x - bx, dy = (a.y - by) / RATIO; return Math.sqrt(dx * dx + dy * dy); }
 
-  var tries = 0;
+  /* Anamorphose : on « redresse » l'image en la compressant le long de son axe (simulation du point de vue de côté). */
+  function playMorph() {
+    if (!ART.morph) return;
+    var m = $('morph'), img = $('morphImg'), M = ART.morph;
+    img.src = M.img; m.hidden = false;
+    img.style.transition = 'none';
+    img.style.transform = 'rotate(' + M.angle + 'deg) scaleX(' + M.stretch + ')';
+    void img.offsetWidth;
+    setTimeout(function () { img.style.transition = ''; img.style.transform = 'none'; }, 350);
+  }
+  function hideMorph() { $('morph').hidden = true; }
+
+  /* ================= Le jeu : toucher le détail caché ================= */
+  var tap = null, tries = 0;
   frame.addEventListener('click', function (e) {
-    if (state.phase !== 'bird') return;
+    if (state.phase !== 'tap' || !tap) return;
     var r = frame.getBoundingClientRect();
     var fx = (e.clientX - r.left) / r.width, fy = (e.clientY - r.top) / r.height;
     var rp = document.createElement('span'); rp.className = 'ripple';
     rp.style.left = (fx * 100) + '%'; rp.style.top = (fy * 100) + '%';
     frame.appendChild(rp); setTimeout(function () { rp.remove(); }, 700);
     var p = { x: fx, y: fy };
-    if (dist(p, P.magpie.x, P.magpie.y) <= HIT_MAGPIE) { foundBird(); return; }
-    if (CROWS.some(function (c) { return dist(p, c[0], c[1]) <= HIT_CROW; })) { add('art', 'm_crow', 'fb'); return; }
+    if (dist(p, tap.target.x, tap.target.y) <= tap.hit) { found(false); return; }
+    if (tap.decoys && tap.decoys.some(function (c) { return dist(p, c[0], c[1]) <= tap.decoyHit; })) { add('art', tap.decoyMsg, 'fb'); return; }
     tries++;
-    if (tries >= 3) ring(P.magpie, .12);
-    add('art', tries === 1 ? 'm_miss1' : tries === 2 ? 'm_miss2' : 'm_miss3', 'fb');
-    // Après deux essais, on propose de révéler l'oiseau : personne ne reste bloqué.
-    if (tries === 2) choices([['c_show', function () { foundBird(true); }]]);
+    if (tries >= 3) ring(tap.target, tap.hintRing);
+    add('art', tap.misses[Math.min(tries, tap.misses.length) - 1], 'fb');
+    // Après deux essais, on propose de révéler le détail : personne ne reste bloqué.
+    if (tries === 2) choices([['c_show', function () { found(true); }]]);
   });
 
   /* ================= Dialogue ================= */
@@ -337,12 +246,13 @@
   }
   function scrollChat() { chat.scrollTo ? chat.scrollTo({ top: chat.scrollHeight, behavior: 'smooth' }) : (chat.scrollTop = chat.scrollHeight); }
   // cls 'fb' = réaction à un essai : elle remplace la réaction précédente au lieu de s'empiler.
+  function clearFeedback() {
+    state.log = state.log.filter(function (e) { return e.cls !== 'fb'; });
+    chat.querySelectorAll('.fb').forEach(function (el) { el.remove(); });
+  }
   function add(type, key, cls) {
     var entry = { type: type, key: key, cls: cls || '' };
-    if (entry.cls === 'fb') {
-      state.log = state.log.filter(function (e) { return e.cls !== 'fb'; });
-      chat.querySelectorAll('.fb').forEach(function (el) { el.remove(); });
-    }
+    if (entry.cls === 'fb') clearFeedback();
     state.log.push(entry); chat.appendChild(msgEl(entry)); fitText(); scrollChat();
   }
   function renderChat() {
@@ -365,15 +275,11 @@
     });
     fitText();
   }
-  function next(fn) { choices([['c_next', fn]]); }
   // Attente annulée si l'utilisateur recommence entre-temps.
   function wait(ms) { var run = state.run; return new Promise(function (res, rej) { setTimeout(function () { run === state.run ? res() : rej('reset'); }, ms); }); }
   function guard(p) { return p.catch(function () {}); }
   // Affiche tout le texte d'un coup, puis ajuste sa taille pour qu'il tienne sans défiler.
-  function say(keys, then) {
-    keys.forEach(function (k) { add('art', k); });
-    if (then) then();
-  }
+  function say(keys, then) { keys.forEach(function (k) { add('art', k); }); if (then) then(); }
   var FONT_MAX = MODE === 'presenter' ? 17 : 21, FONT_MIN = 13;
   function fitText() {
     if (state.view !== 'v-talk') return;
@@ -391,66 +297,65 @@
     state.tick = setInterval(function () { $('timer').textContent = fmt((Date.now() - state.start) / 1000); }, 250);
   }
 
-  /* ================= Parcours ================= */
+  /* ================= La visite : un moteur, les chapitres viennent de artworks.js ================= */
   function show(id) { state.view = id; ['v-scan', 'v-talk', 'v-end', 'v-explore'].forEach(function (v) { $(v).hidden = v !== id; }); }
 
   function begin() {
     show('v-talk'); setStep(1); startTimer(); loadHD(); setChapter(0); choices([]);
-    say(['m_hello', 'm_series', 'm_secrets'], function () { choices([['c_go', chHunters]]); });
+    say(ART.intro, function () { choices([['c_go', function () { runChapter(0); }]]); });
   }
   $('startBtn').addEventListener('click', begin);
 
-  // 1. Les chasseurs
-  function chHunters() {
-    setChapter(1); zoomTo(P.hunters); state.found.push('f_hunters');
-    say(['m_h1', 'm_h2'], function () { next(chInn); });
+  function afterChapter(i) {
+    if (i >= CHAPTERS - 1) { setStep(4); choices([['c_time', finish]]); }
+    else choices([['c_next', function () { runChapter(i + 1); }]]);
   }
-  // 2. L'auberge et son enseigne
-  function chInn() {
-    setChapter(2); zoomTo(P.inn); ring(P.sign, .085, P.inn.k); state.found.push('f_inn');
-    say(['m_i1', 'm_i2'], function () { next(chBird); });
+  function runChapter(i) {
+    var c = TOUR[i];
+    state.ci = i; setChapter(i + 1); clearRings(); hideMorph();
+    if (c.tap) return startTap(c.tap, i);
+    if (c.choice) return startChoice(c.choice, i);
+    if (c.zoom) zoomTo(c.zoom); else zoomOut();
+    if (c.ring) ring(c.ring.p, c.ring.size, c.zoom ? c.zoom.k : 1);
+    if (c.found) state.found.push(c.found);
+    say(c.texts, function () { afterChapter(i); });
+    if (c.then) guard(wait(c.then.ms).then(function () {
+      if (state.ci !== i) return;
+      clearRings(); zoomTo(c.then.zoom);
+      if (c.then.ring) ring(c.then.ring.p, c.then.ring.size, c.then.zoom.k);
+    }));
   }
-  // 3. Le jeu : l'oiseau caché
-  function chBird() {
-    clearRings(); zoomOut(); setChapter(3); setStep(2);
-    state.phase = 'bird'; tries = 0; frame.classList.add('tappable'); setTag();
-    add('art', 'm_askBird');
+  function startTap(q, i) {
+    tap = q; tap.i = i; tries = 0;
+    zoomOut(); setStep(2); state.phase = 'tap'; frame.classList.add('tappable'); setTag();
+    add('art', q.ask);
   }
-  function foundBird(revealed) {
+  function found(revealed) {
     state.phase = 'story'; frame.classList.remove('tappable'); setStep(3); setTag();
-    ring(P.magpie, .06, 4); zoomTo(P.magpie, 4);
-    state.found.push('f_bird');
-    state.log = state.log.filter(function (e) { return e.cls !== 'fb'; }); chat.querySelectorAll('.fb').forEach(function (el) { el.remove(); });
+    ring(tap.target, tap.ringSize, tap.k); zoomTo(tap.target, tap.k);
+    state.found.push(tap.found);
+    clearFeedback();
     if (!revealed) {
       state.choices = []; actionsEl.innerHTML = '';
       add('me', 'me_found', 'found');
-      // Récompense : un éclair doré et une petite vibration (Android).
+      // Récompense : un éclair et une petite vibration (Android).
       var art = $('art'); art.classList.remove('flash'); void art.offsetWidth; art.classList.add('flash');
       try { if (navigator.vibrate) navigator.vibrate([30, 40, 30]); } catch (e) {}
     }
-    say(['m_birdStory'], function () { next(chValley); });
+    say(tap.story, function () { afterChapter(tap.i); });
   }
-  // 4. La vallée gelée et le moulin (le zoom glisse des étangs vers le moulin)
-  function chValley() {
-    clearRings(); setChapter(4); zoomTo(P.pond); state.found.push('f_mill');
-    say(['m_p1', 'm_p2'], function () { next(chChimney); });
-    guard(wait(2800).then(function () { if (state.chapter === 4) zoomTo(P.mill); }));
+  function startChoice(q, i) {
+    zoomOut();
+    add('art', q.ask);
+    choices(q.options.map(function (o) { return [o[0], function () { answer(q, o[1], i); }]; }));
   }
-  // 5. La question de la cheminée
-  function chChimney() {
-    setChapter(5); zoomOut();
-    add('art', 'm_askSmoke');
-    choices([['c_fall', function () { smoke(false); }], ['c_fire', function () { smoke(true); }], ['c_smoke', function () { smoke(false); }]]);
-  }
-  function smoke(ok) {
-    state.found.push('f_smoke');
-    ring(P.chimney, .05, 6); zoomTo(P.chimney, 6);
-    say([ok ? 'm_smokeOk' : 'm_smokeNo'], function () { next(chAlps); });
-  }
-  // 6. Les montagnes, et la fin
-  function chAlps() {
-    clearRings(); setChapter(6); zoomTo(P.alps); state.found.push('f_alps'); setStep(4);
-    say(['m_m1', 'm_m2'], function () { choices([['c_time', finish]]); });
+  function answer(q, ok, i) {
+    state.found.push(q.found);
+    if (q.zoom) { zoomTo(q.zoom); if (q.ringSize) ring(q.zoom, q.ringSize, q.zoom.k); }
+    say([ok ? q.ok : q.no], function () {
+      if (q.morph) guard(wait(500).then(playMorph));
+      afterChapter(i);
+    });
   }
 
   function finish() {
@@ -478,22 +383,21 @@
   function reset() {
     clearInterval(state.tick);
     var run = state.run; state = freshState(); state.run = run + 1;
-    tries = 0; chat.innerHTML = ''; actionsEl.innerHTML = ''; clearRings(); zoomOut();
+    tries = 0; tap = null; chat.innerHTML = ''; actionsEl.innerHTML = ''; clearRings(); zoomOut(); hideMorph();
     frame.classList.remove('tappable');
     $('timer').textContent = '0:00'; setChapter(0);
     show('v-scan'); setStep(0);
   }
   $('nextBtn').addEventListener('click', reset);
   if ($('restart')) $('restart').addEventListener('click', reset);
+  // Œuvre suivante : comme si le visiteur scannait le QR code du tableau d'à côté.
+  $('nextArtBtn').addEventListener('click', function () {
+    location.href = location.pathname + '?art=' + NEXT_ART + (lang === 'en' ? '&lang=en' : '');
+  });
 
   /* ================= Explorer le tableau : zoom libre + détails numérotés =================
      Pincer / glisser au doigt, double-toucher pour zoomer, molette sur ordinateur. */
-  var SPOTS = [
-    { id: 'hunters', p: P.hunters, k: 2.6 }, { id: 'fire', p: { x: .125, y: .609 }, k: 4 },
-    { id: 'sign', p: P.sign, k: 4.5 }, { id: 'bird', p: P.magpie, k: 5 },
-    { id: 'pond', p: { x: .78, y: .58 }, k: 3 }, { id: 'mill', p: P.mill, k: 4 },
-    { id: 'smoke', p: P.chimney, k: 7 }, { id: 'alps', p: P.alps, k: 2.6 }
-  ];
+  var SPOTS = ART.spots;
   var exStage = $('exStage'), exLayer = $('exLayer'), exSheet = $('exSheet');
   var ex = { k: 1, tx: 0, ty: 0, w: 0, h: 0, cw: 0, ch: 0, sel: -1 };
   SPOTS.forEach(function (s, i) {
@@ -542,7 +446,7 @@
     exLayer.querySelectorAll('.hs').forEach(function (b) { b.classList.remove('on'); });
   }
   function openExplore() {
-    $('exImg').src = $('paintImg').src || IMG;
+    $('exImg').src = $('paintImg').src || ART.img;
     show('v-explore'); exUnselect(); ex.k = 1; exLayout();
   }
   $('exploreBtn').addEventListener('click', openExplore);
@@ -608,5 +512,5 @@
   }
 
   // Pour les tests automatisés uniquement (aucune donnée transmise).
-  window.__lookCloser = { state: function () { return state; }, P: P, crows: CROWS };
+  window.__lookCloser = { state: function () { return state; }, art: ART, tour: TOUR };
 })();
