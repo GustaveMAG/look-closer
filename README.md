@@ -6,4 +6,6 @@
 - `presenter.html` : la version à projeter pendant le pitch (téléphone + 5 étapes).
 - `qr-code.png` : QR code vers le site.
 
-Site statique (HTML/CSS/JS), sans compte ni collecte de données. Le tableau « Hiver au village » est une œuvre fictive dessinée en code.
+Site statique (HTML/CSS/JS), sans compte ni collecte de données.
+
+Œuvre : Pieter Bruegel l'Ancien, *Chasseurs dans la neige* (1565), Kunsthistorisches Museum, Vienne. Image via Wikimedia Commons, domaine public. Les textes s'appuient sur les notices Wikipédia du tableau. Démo sans lien avec le musée.

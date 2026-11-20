@@ -3,65 +3,62 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#14171f">
+<meta name="theme-color" content="#ffffff">
 <title>Look Closer · Pitch</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2314171f'/%3E%3Ccircle cx='16' cy='16' r='8' fill='none' stroke='%23d9b56c' stroke-width='3'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%23d9b56c'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23fff'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%23e0401f'/%3E%3C/svg%3E">
+<link rel="preload" as="image" href="img/bruegel-1600.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;600;700&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,500&display=swap" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="style.css">
 <style>
-  /* Scène du pitch : téléphone à gauche, les 5 étapes à droite ; empilé sur petit écran. */
-  body { background: radial-gradient(900px 600px at 30% 20%, rgba(217,181,108,.10), transparent 60%), var(--wall); min-height: 100vh; }
-  .wrap { max-width: 1180px; margin: 0 auto; padding: 28px max(16px, env(safe-area-inset-right, 0px)) 40px max(16px, env(safe-area-inset-left, 0px)); }
-  header.top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 12px; margin-bottom: 22px; }
-  .brand { font-size: 12px; letter-spacing: .28em; text-transform: uppercase; color: var(--gold); font-weight: 700; }
-  h1 { font-family: var(--serif); font-weight: 400; font-size: clamp(34px, 5vw, 56px); line-height: 1; margin: 6px 0 0; }
-  h1 em { color: var(--gold); }
-  .tools { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-  .restart { background: none; border: 1px solid var(--line); color: var(--dim); border-radius: 999px; padding: 10px 16px; font-weight: 600; font-size: 14px; min-height: 44px; }
-  .restart:hover, .restart:focus-visible { color: var(--ink); border-color: var(--gold); outline: none; }
-  .stage { display: grid; grid-template-columns: minmax(0, 400px) minmax(0, 1fr); gap: 40px; align-items: start; }
-  @media (max-width: 860px) { .stage { grid-template-columns: 1fr; } }
-  .phone { width: 100%; max-width: 380px; margin: 0 auto; aspect-ratio: 9 / 18.5; background: #0b0d13; border-radius: 44px; padding: 12px;
-    box-shadow: 0 0 0 2px #2a3046, 0 40px 80px -30px rgba(0,0,0,.8); position: relative; }
-  .screen { position: relative; height: 100%; border-radius: 34px; overflow: hidden; }
-  .notch { position: absolute; top: 8px; left: 50%; width: 92px; height: 24px; margin-left: -46px; background: #0b0d13; border-radius: 20px; z-index: 6; }
+  /* Scène du pitch : mur blanc, téléphone à gauche, les 5 étapes à droite ; empilé sur petit écran. */
+  body { min-height: 100vh; }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 36px max(20px, env(safe-area-inset-right, 0px)) 48px max(20px, env(safe-area-inset-left, 0px)); }
+  header.top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; padding-bottom: 20px; border-bottom: 1px solid var(--ink); margin-bottom: 40px; }
+  .brand { font-weight: 700; font-size: 18px; display: flex; align-items: center; gap: 10px; }
+  .brand .dot { width: 11px; height: 11px; border-radius: 50%; background: var(--accent); }
+  .brand small { font-weight: 500; color: var(--mute); font-size: 14px; }
+  .tools { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  .restart { background: none; border: 1px solid var(--ink); padding: 0 18px; min-height: 44px; font-weight: 600; font-size: 14px; }
+  .restart:hover { background: var(--ink); color: #fff; }
+  .stage { display: grid; grid-template-columns: minmax(0, 390px) minmax(0, 1fr); gap: 72px; align-items: start; }
+  @media (max-width: 900px) { .stage { grid-template-columns: 1fr; gap: 40px; } }
+  .phone { width: 100%; max-width: 380px; margin: 0 auto; aspect-ratio: 9 / 19; background: #111; border-radius: 46px; padding: 11px;
+    box-shadow: 0 30px 60px -30px rgba(0,0,0,.45); position: relative; }
+  .screen { position: relative; height: 100%; border-radius: 36px; overflow: hidden; background: #fff; }
+  .notch { position: absolute; top: 9px; left: 50%; width: 90px; height: 24px; margin-left: -45px; background: #111; border-radius: 20px; z-index: 6; }
   #app { height: 100%; }
   /* Texte un peu plus compact dans le téléphone simulé */
-  .presenter .msg { font-size: 14px; padding: 10px 13px; }
-  .presenter .chip { min-height: 42px; font-size: 14px; padding: 8px 14px; }
-  .presenter .btn { min-height: 48px; font-size: 15px; }
-  .presenter .big { font-size: 52px; }
-  .presenter .found-item, .presenter .night { font-size: 13px; }
-  .side { display: grid; gap: 18px; min-width: 0; }
-  .quote { font-family: var(--serif); font-style: italic; font-size: clamp(24px, 2.7vw, 32px); line-height: 1.2; margin: 0; text-wrap: balance; }
-  .quote span { color: var(--gold); }
-  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
-  .steps li { display: grid; grid-template-columns: 32px 1fr; gap: 12px; padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: rgba(32,38,58,.5); transition: border-color .3s, background .3s; }
-  .steps li .n { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line); display: grid; place-items: center; font-size: 14px; font-weight: 700; color: var(--dim); }
-  .steps li h3 { margin: 0 0 3px; font-size: 16px; }
-  .steps li p { margin: 0; font-size: 14px; color: var(--dim); line-height: 1.5; }
-  .steps li.on { border-color: var(--gold); background: rgba(217,181,108,.08); }
-  .steps li.on .n { background: var(--gold); color: var(--gold-ink); border-color: var(--gold); }
-  .steps li.done .n { background: var(--good); color: #0d2a1b; border-color: var(--good); }
-  .try { display: flex; gap: 16px; align-items: center; padding: 14px; border: 1px dashed var(--gold); border-radius: 14px; }
-  .try img { width: 120px; height: 120px; background: #fff; border-radius: 8px; padding: 6px; image-rendering: pixelated; flex: none; }
-  .try b { display: block; font-size: 17px; margin-bottom: 4px; }
-  .try code { font-family: var(--sans); color: var(--gold); font-size: 14px; word-break: break-all; }
-  .note { font-size: 12.5px; color: var(--dim); line-height: 1.5; margin: 0; }
+  .presenter .msg.art-says { font-size: 16px; }
+  .presenter .chip, .presenter .btn { min-height: 46px; font-size: 14px; }
+  .presenter .cartel .title { font-size: 24px; }
+  .presenter .big { font-size: 76px; }
+  .presenter .end { gap: 18px; }
+  .side { display: grid; gap: 36px; min-width: 0; }
+  .quote { font-size: clamp(30px, 3.6vw, 52px); line-height: 1.05; letter-spacing: -.03em; font-weight: 500; margin: 0; text-wrap: balance; }
+  .steps { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+  .steps li { display: grid; grid-template-columns: 56px 1fr; gap: 16px; padding: 18px 0; border-bottom: 1px solid var(--line); color: var(--faint); transition: color .4s; }
+  .steps li .n { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; padding-top: 3px; }
+  .steps li h3 { margin: 0 0 4px; font-size: 20px; font-weight: 600; letter-spacing: -.01em; }
+  .steps li p { margin: 0; font-size: 15px; line-height: 1.5; }
+  .steps li.done { color: var(--mute); }
+  .steps li.on { color: var(--ink); }
+  .steps li.on .n { color: var(--accent); }
+  .try { display: flex; gap: 22px; align-items: center; }
+  .try img { width: 128px; height: 128px; image-rendering: pixelated; flex: none; }
+  .try b { display: block; font-size: 20px; font-weight: 600; margin: 6px 0 4px; }
+  .try code { font-family: var(--sans); color: var(--mute); font-size: 15px; word-break: break-all; }
+  .note { font-size: 13px; color: var(--mute); line-height: 1.5; margin: 0; max-width: 46em; }
 </style>
 </head>
 <body class="presenter" data-mode="presenter">
 <div class="wrap">
   <header class="top">
-    <div>
-      <div class="brand">Artthropic · Prototype</div>
-      <h1>Look <em>Closer</em></h1>
-    </div>
+    <div class="brand"><span class="dot" aria-hidden="true"></span>Look Closer <small>Artthropic · Prototype</small></div>
     <div class="tools">
       <div class="lang" role="group" aria-label="Langue"><button type="button" data-lang="fr" lang="fr">FR</button><button type="button" data-lang="en" lang="en">EN</button></div>
-      <button class="restart" id="restart" type="button" data-i18n="restart">↺ Recommencer la démo</button>
+      <button class="restart" id="restart" type="button" data-i18n="restart">Recommencer la démo</button>
     </div>
   </header>
 
@@ -74,17 +71,17 @@
     </div>
 
     <aside class="side">
-      <p class="quote" data-i18n-html="quote"></p>
+      <p class="quote" data-i18n="quote"></p>
       <ol class="steps" id="steps">
-        <li data-step="0"><span class="n">1</span><div><h3 data-i18n="s1t"></h3><p data-i18n="s1p"></p></div></li>
-        <li data-step="1"><span class="n">2</span><div><h3 data-i18n="s2t"></h3><p data-i18n="s2p"></p></div></li>
-        <li data-step="2"><span class="n">3</span><div><h3 data-i18n="s3t"></h3><p data-i18n="s3p"></p></div></li>
-        <li data-step="3"><span class="n">4</span><div><h3 data-i18n="s4t"></h3><p data-i18n="s4p"></p></div></li>
-        <li data-step="4"><span class="n">5</span><div><h3 data-i18n="s5t"></h3><p data-i18n="s5p"></p></div></li>
+        <li data-step="0"><span class="n">01</span><div><h3 data-i18n="s1t"></h3><p data-i18n="s1p"></p></div></li>
+        <li data-step="1"><span class="n">02</span><div><h3 data-i18n="s2t"></h3><p data-i18n="s2p"></p></div></li>
+        <li data-step="2"><span class="n">03</span><div><h3 data-i18n="s3t"></h3><p data-i18n="s3p"></p></div></li>
+        <li data-step="3"><span class="n">04</span><div><h3 data-i18n="s4t"></h3><p data-i18n="s4p"></p></div></li>
+        <li data-step="4"><span class="n">05</span><div><h3 data-i18n="s5t"></h3><p data-i18n="s5p"></p></div></li>
       </ol>
       <div class="try">
-        <img src="qr-code.png" alt="QR code vers l'expérience visiteur" width="120" height="120">
-        <div><b data-i18n="tryIt"></b><code>gustavemag.github.io/look-closer</code></div>
+        <img src="qr-code.png" alt="QR code vers l'expérience visiteur" width="128" height="128">
+        <div><span class="label" data-i18n="tryIt"></span><b>gustavemag.github.io/look-closer</b></div>
       </div>
       <p class="note" data-i18n="note"></p>
     </aside>
