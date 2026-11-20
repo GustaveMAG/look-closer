@@ -50,6 +50,17 @@
       m_m1: 'Et ces montagnes pointues, au fond ? Il n’y en a pas en Flandre ! Bruegel avait traversé les Alpes pendant son voyage en Italie.',
       m_m2: 'Quatre siècles plus tard, le cinéaste Andreï Tarkovski m’a filmé longuement dans « Solaris » (1972). Tu sais maintenant pourquoi : plus on me regarde, plus j’en raconte.',
       c_time: 'Voir mon temps de regard',
+      c_show: 'Montre-moi',
+      explore: 'Explorer le tableau', close: 'Fermer', exHint: 'Pincez pour zoomer · touchez un numéro',
+      h_hunters: 'Les chasseurs', h_fire: 'Le feu', h_sign: 'L’enseigne', h_bird: 'La pie', h_pond: 'Les patineurs', h_mill: 'Le moulin gelé', h_smoke: 'La cheminée en feu', h_alps: 'Les montagnes',
+      x_hunters: 'Trois chasseurs rentrent au village avec leurs chiens, fatigués. Leur seul butin : un renard bien maigre.',
+      x_fire: 'Devant l’auberge, des adultes et un enfant ont allumé un grand feu pour griller un cochon.',
+      x_sign: 'L’enseigne pend, presque décrochée. Elle représente saint Hubert, ou saint Eustache, patron des chasseurs.',
+      x_bird: 'Une pie en plein vol. Avec les corneilles, on y lit souvent un mauvais présage : à l’époque, la pie était associée au diable.',
+      x_pond: 'Sur les étangs gelés, on patine, on joue à un ancêtre du hockey et à l’eisstock, un cousin du curling.',
+      x_mill: 'La roue du moulin à eau est prise dans la glace. Elle ne tourne plus.',
+      x_smoke: 'Près de l’église, un feu de cheminée. Pendant que les uns patinent, d’autres ont un vrai souci.',
+      x_alps: 'Des montagnes pointues qui n’existent pas en Flandre : Bruegel avait traversé les Alpes pendant son voyage en Italie.',
 
       endLead: 'Votre temps de regard',
       ratio: function (r) { return 'Soit ' + r + ' fois plus que la moyenne des visiteurs.'; },
@@ -113,6 +124,17 @@
       m_m1: 'And those jagged mountains in the distance? There are none in Flanders! Bruegel had crossed the Alps on his journey to Italy.',
       m_m2: 'Four centuries later, the film-maker Andrei Tarkovsky lingered on me in “Solaris” (1972). Now you know why: the longer you look at me, the more I tell.',
       c_time: 'See my looking time',
+      c_show: 'Show me',
+      explore: 'Explore the painting', close: 'Close', exHint: 'Pinch to zoom · tap a number',
+      h_hunters: 'The hunters', h_fire: 'The fire', h_sign: 'The inn sign', h_bird: 'The magpie', h_pond: 'The skaters', h_mill: 'The frozen mill', h_smoke: 'The chimney fire', h_alps: 'The mountains',
+      x_hunters: 'Three weary hunters return to the village with their dogs. Their only catch: a scrawny fox.',
+      x_fire: 'In front of the inn, some adults and a child have lit a big fire to singe a pig.',
+      x_sign: 'The sign is hanging, almost falling off. It shows Saint Hubert, or Saint Eustace, the patron saint of hunters.',
+      x_bird: 'A magpie in mid-flight. With the crows, it is often read as a bad omen: back then, the magpie was linked to the Devil.',
+      x_pond: 'On the frozen ponds, people skate and play an early form of hockey and eisstock, a cousin of curling.',
+      x_mill: 'The watermill’s wheel is caught in the ice. It no longer turns.',
+      x_smoke: 'Near the church, a chimney fire. While some people skate, others have a real problem.',
+      x_alps: 'Jagged mountains that do not exist in Flanders: Bruegel had crossed the Alps on his journey to Italy.',
 
       endLead: 'Your looking time',
       ratio: function (r) { return 'That’s ' + r + ' times longer than the average visitor.'; },
@@ -190,8 +212,16 @@
         '<div class="bar you"><span data-i18n="you"></span><span class="track"><span class="fill" id="barYou"></span></span></div></div>' +
       '<div><span class="label" data-i18n="foundLead"></span><div class="found-list" id="foundList" style="margin-top:10px"></div></div>' +
       '<div class="night"><span class="label" data-i18n="nightKicker"></span><b data-i18n="nightTitle"></b><span data-i18n="nightText"></span></div>' +
-      '<button class="btn" id="nextBtn" type="button" data-i18n="' + (MODE === 'presenter' ? 'next' : 'again') + '"></button>' +
+      '<div class="end-cta"><button class="btn" id="exploreBtn" type="button" data-i18n="explore"></button>' +
+      '<button class="btn ghost" id="nextBtn" type="button" data-i18n="' + (MODE === 'presenter' ? 'next' : 'again') + '"></button></div>' +
       '<p class="credit" data-i18n="credit"></p>' +
+    '</section>' +
+    '<section class="view explore" id="v-explore" hidden>' +
+      '<div class="ex-stage" id="exStage"><div class="ex-layer" id="exLayer"><img id="exImg" alt="" draggable="false"></div></div>' +
+      '<div class="ex-bar"><span class="label" data-i18n="exHint"></span><button class="ex-close" id="exClose" type="button" data-i18n="close"></button></div>' +
+      '<div class="ex-sheet" id="exSheet" hidden><div class="ex-head"><span class="label" id="exPos"></span>' +
+        '<span class="ex-nav"><button type="button" id="exPrev" aria-label="‹">‹</button><button type="button" id="exNext" aria-label="›">›</button></span></div>' +
+        '<b id="exTitle"></b><p id="exText"></p></div>' +
     '</section></div>';
 
   var $ = function (id) { return document.getElementById(id); };
@@ -235,6 +265,7 @@
     if (l === lang) return;
     lang = l; applyStatic(); renderChat(); renderChoices();
     if (state.view === 'v-end') renderEnd(false);
+    if (state.view === 'v-explore') renderSheet();
   }
   document.querySelectorAll('[data-lang]').forEach(function (b) { b.addEventListener('click', function () { setLang(b.getAttribute('data-lang')); }); });
 
@@ -293,6 +324,8 @@
     tries++;
     if (tries >= 3) ring(P.magpie, .12);
     add('art', tries === 1 ? 'm_miss1' : tries === 2 ? 'm_miss2' : 'm_miss3', 'fb');
+    // Après deux essais, on propose de révéler l'oiseau : personne ne reste bloqué.
+    if (tries === 2) choices([['c_show', function () { foundBird(true); }]]);
   });
 
   /* ================= Dialogue ================= */
@@ -359,7 +392,7 @@
   }
 
   /* ================= Parcours ================= */
-  function show(id) { state.view = id; ['v-scan', 'v-talk', 'v-end'].forEach(function (v) { $(v).hidden = v !== id; }); }
+  function show(id) { state.view = id; ['v-scan', 'v-talk', 'v-end', 'v-explore'].forEach(function (v) { $(v).hidden = v !== id; }); }
 
   function begin() {
     show('v-talk'); setStep(1); startTimer(); loadHD(); setChapter(0); choices([]);
@@ -383,12 +416,18 @@
     state.phase = 'bird'; tries = 0; frame.classList.add('tappable'); setTag();
     add('art', 'm_askBird');
   }
-  function foundBird() {
+  function foundBird(revealed) {
     state.phase = 'story'; frame.classList.remove('tappable'); setStep(3); setTag();
     ring(P.magpie, .06, 4); zoomTo(P.magpie, 4);
     state.found.push('f_bird');
     state.log = state.log.filter(function (e) { return e.cls !== 'fb'; }); chat.querySelectorAll('.fb').forEach(function (el) { el.remove(); });
-    add('me', 'me_found', 'found');
+    if (!revealed) {
+      state.choices = []; actionsEl.innerHTML = '';
+      add('me', 'me_found', 'found');
+      // Récompense : un éclair doré et une petite vibration (Android).
+      var art = $('art'); art.classList.remove('flash'); void art.offsetWidth; art.classList.add('flash');
+      try { if (navigator.vibrate) navigator.vibrate([30, 40, 30]); } catch (e) {}
+    }
     say(['m_birdStory'], function () { next(chValley); });
   }
   // 4. La vallée gelée et le moulin (le zoom glisse des étangs vers le moulin)
@@ -447,7 +486,126 @@
   $('nextBtn').addEventListener('click', reset);
   if ($('restart')) $('restart').addEventListener('click', reset);
 
+  /* ================= Explorer le tableau : zoom libre + détails numérotés =================
+     Pincer / glisser au doigt, double-toucher pour zoomer, molette sur ordinateur. */
+  var SPOTS = [
+    { id: 'hunters', p: P.hunters, k: 2.6 }, { id: 'fire', p: { x: .125, y: .609 }, k: 4 },
+    { id: 'sign', p: P.sign, k: 4.5 }, { id: 'bird', p: P.magpie, k: 5 },
+    { id: 'pond', p: { x: .78, y: .58 }, k: 3 }, { id: 'mill', p: P.mill, k: 4 },
+    { id: 'smoke', p: P.chimney, k: 7 }, { id: 'alps', p: P.alps, k: 2.6 }
+  ];
+  var exStage = $('exStage'), exLayer = $('exLayer'), exSheet = $('exSheet');
+  var ex = { k: 1, tx: 0, ty: 0, w: 0, h: 0, cw: 0, ch: 0, sel: -1 };
+  SPOTS.forEach(function (s, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'hs'; b.textContent = i + 1;
+    b.style.left = (s.p.x * 100) + '%'; b.style.top = (s.p.y * 100) + '%'; b.setAttribute('data-i', i);
+    exLayer.appendChild(b);
+  });
+  function exLayout() {
+    var r = exStage.getBoundingClientRect();
+    ex.cw = r.width; ex.ch = r.height; ex.w = r.width; ex.h = r.width / RATIO;
+    exLayer.style.width = ex.w + 'px'; exLayer.style.height = ex.h + 'px';
+    exApply(false);
+  }
+  function exApply(anim) {
+    ex.k = Math.max(1, Math.min(8, ex.k));
+    var W = ex.w * ex.k, H = ex.h * ex.k;
+    ex.tx = W <= ex.cw ? (ex.cw - W) / 2 : Math.min(0, Math.max(ex.cw - W, ex.tx));
+    ex.ty = H <= ex.ch ? (ex.ch - H) / 2 : Math.min(0, Math.max(ex.ch - H, ex.ty));
+    exLayer.classList.toggle('anim', !!anim);
+    exLayer.style.transform = 'translate(' + ex.tx + 'px,' + ex.ty + 'px) scale(' + ex.k + ')';
+    exLayer.style.setProperty('--k', ex.k);
+  }
+  function exZoomAt(cx, cy, k, anim) {
+    var ix = (cx - ex.tx) / ex.k, iy = (cy - ex.ty) / ex.k;
+    ex.k = Math.max(1, Math.min(8, k)); ex.tx = cx - ix * ex.k; ex.ty = cy - iy * ex.k; exApply(anim);
+  }
+  function exFocus(p, k) {
+    var visibleH = ex.ch - (exSheet.hidden ? 0 : exSheet.offsetHeight);
+    ex.k = Math.max(1, Math.min(8, k));
+    ex.tx = ex.cw / 2 - p.x * ex.w * ex.k; ex.ty = visibleH / 2 - p.y * ex.h * ex.k; exApply(true);
+  }
+  function exSelect(i) {
+    ex.sel = (i + SPOTS.length) % SPOTS.length;
+    exLayer.querySelectorAll('.hs').forEach(function (b, j) { b.classList.toggle('on', j === ex.sel); });
+    exSheet.hidden = false; renderSheet();
+    exFocus(SPOTS[ex.sel].p, SPOTS[ex.sel].k);
+  }
+  function renderSheet() {
+    if (ex.sel < 0) return;
+    var s = SPOTS[ex.sel];
+    $('exPos').textContent = (ex.sel + 1) + ' / ' + SPOTS.length;
+    $('exTitle').textContent = t('h_' + s.id); $('exText').textContent = t('x_' + s.id);
+  }
+  function exUnselect() {
+    ex.sel = -1; exSheet.hidden = true;
+    exLayer.querySelectorAll('.hs').forEach(function (b) { b.classList.remove('on'); });
+  }
+  function openExplore() {
+    $('exImg').src = $('paintImg').src || IMG;
+    show('v-explore'); exUnselect(); ex.k = 1; exLayout();
+  }
+  $('exploreBtn').addEventListener('click', openExplore);
+  $('exClose').addEventListener('click', function () { show('v-end'); });
+  $('exPrev').addEventListener('click', function () { exSelect(ex.sel - 1); });
+  $('exNext').addEventListener('click', function () { exSelect(ex.sel + 1); });
+  window.addEventListener('resize', function () { if (state.view === 'v-explore') exLayout(); });
+
+  var pts = {}, gesture = null, moved = false, lastTap = 0;
+  function local(e) { var r = exStage.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
+  function ptList() { return Object.keys(pts).map(function (k) { return pts[k]; }); }
+  function startGesture() {
+    var l = ptList();
+    if (l.length === 1) gesture = { type: 'pan', sx: l[0].x, sy: l[0].y, tx: ex.tx, ty: ex.ty };
+    else if (l.length >= 2) {
+      var mx = (l[0].x + l[1].x) / 2, my = (l[0].y + l[1].y) / 2;
+      gesture = { type: 'pinch', d0: Math.hypot(l[0].x - l[1].x, l[0].y - l[1].y) || 1, k0: ex.k, ix: (mx - ex.tx) / ex.k, iy: (my - ex.ty) / ex.k };
+    } else gesture = null;
+  }
+  exStage.addEventListener('pointerdown', function (e) {
+    if (e.target.closest('.hs')) return; // les numéros gèrent leur propre clic
+    try { exStage.setPointerCapture(e.pointerId); } catch (err) {}
+    pts[e.pointerId] = local(e); if (ptList().length === 1) moved = false; startGesture();
+  });
+  exStage.addEventListener('pointermove', function (e) {
+    if (!pts[e.pointerId] || !gesture) return;
+    pts[e.pointerId] = local(e); var l = ptList();
+    if (gesture.type === 'pan' && l.length === 1) {
+      var dx = l[0].x - gesture.sx, dy = l[0].y - gesture.sy;
+      if (Math.hypot(dx, dy) > 6) moved = true;
+      if (moved) { ex.tx = gesture.tx + dx; ex.ty = gesture.ty + dy; exApply(false); }
+    } else if (gesture.type === 'pinch' && l.length >= 2) {
+      moved = true;
+      var d = Math.hypot(l[0].x - l[1].x, l[0].y - l[1].y), mx = (l[0].x + l[1].x) / 2, my = (l[0].y + l[1].y) / 2;
+      ex.k = Math.max(1, Math.min(8, gesture.k0 * d / gesture.d0));
+      ex.tx = mx - gesture.ix * ex.k; ex.ty = my - gesture.iy * ex.k; exApply(false);
+    }
+  });
+  function endPointer(e) {
+    if (!pts[e.pointerId]) return;
+    var pos = pts[e.pointerId]; delete pts[e.pointerId];
+    if (ptList().length) { startGesture(); return; }
+    gesture = null;
+    if (moved) return;
+    var now = Date.now();
+    if (now - lastTap < 320) { lastTap = 0; exZoomAt(pos.x, pos.y, ex.k > 1.5 ? 1 : 3, true); }
+    else { lastTap = now; if (!exSheet.hidden) setTimeout(function () { if (lastTap === now) exUnselect(); }, 330); }
+  }
+  exStage.addEventListener('pointerup', endPointer);
+  exStage.addEventListener('pointercancel', endPointer);
+  exStage.addEventListener('wheel', function (e) {
+    e.preventDefault(); var p = local(e); exZoomAt(p.x, p.y, ex.k * (e.deltaY < 0 ? 1.25 : 0.8), false);
+  }, { passive: false });
+  exLayer.addEventListener('click', function (e) {
+    var b = e.target.closest('.hs'); if (b) { e.stopPropagation(); exSelect(+b.getAttribute('data-i')); }
+  });
+
   applyStatic(); setStep(0);
+
+  /* Hors ligne : le site reste disponible même si la connexion tombe, et s'installe sur l'écran d'accueil. */
+  if ('serviceWorker' in navigator && MODE === 'visitor' && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+  }
 
   // Pour les tests automatisés uniquement (aucune donnée transmise).
   window.__lookCloser = { state: function () { return state; }, P: P, crows: CROWS };
