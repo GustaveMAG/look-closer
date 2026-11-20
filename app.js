@@ -15,9 +15,9 @@
       meta: 'Huile sur bois, 117 × 162 cm<br>Kunsthistorisches Museum, Vienne',
       imgAlt: 'Chasseurs dans la neige, Pieter Bruegel l’Ancien, 1565 : trois chasseurs et leurs chiens rentrent au village enneigé, en contrebas des patineurs sur des étangs gelés.',
       start: 'Commencer la visite', startScan: 'Scanner le QR code',
-      hintStart: 'Environ 3 minutes · sans appli, sans compte',
+      hintStart: '6 détails à découvrir · environ 3 minutes · sans appli, sans compte',
       hintPresenter: 'Sans appli · sur votre propre téléphone',
-      tagGo: 'Touchez l’oiseau', who: 'L’œuvre',
+      tagGo: 'Touchez l’oiseau', who: 'L’œuvre', intro: 'Introduction', chapter: 'Chapitre',
       ch1: 'Les chasseurs', ch2: 'L’auberge', ch3: 'L’oiseau caché', ch4: 'La vallée gelée', ch5: 'La cheminée', ch6: 'Les montagnes',
 
       m_hello: 'Bonjour. Je suis « Chasseurs dans la neige ». Pieter Bruegel l’Ancien m’a peint en 1565.',
@@ -78,9 +78,9 @@
       meta: 'Oil on panel, 117 × 162 cm<br>Kunsthistorisches Museum, Vienna',
       imgAlt: 'The Hunters in the Snow, Pieter Bruegel the Elder, 1565: three hunters and their dogs return to a snowy village, above skaters on frozen ponds.',
       start: 'Start the tour', startScan: 'Scan the QR code',
-      hintStart: 'About 3 minutes · no app, no account',
+      hintStart: '6 details to discover · about 3 minutes · no app, no account',
       hintPresenter: 'No app · on your own phone',
-      tagGo: 'Tap the bird', who: 'The artwork',
+      tagGo: 'Tap the bird', who: 'The artwork', intro: 'Introduction', chapter: 'Chapter',
       ch1: 'The hunters', ch2: 'The inn', ch3: 'The hidden bird', ch4: 'The frozen valley', ch5: 'The chimney', ch6: 'The mountains',
 
       m_hello: 'Hello. I’m “The Hunters in the Snow”. Pieter Bruegel the Elder painted me in 1565.',
@@ -179,8 +179,9 @@
     '<section class="view talk" id="v-talk" hidden>' +
       '<div class="art" id="art"><div class="frame" id="frame" style="background-image:url(' + LQIP + ')"><img id="paintImg" data-src="' + IMG + '" data-i18n-alt="imgAlt" decoding="async"></div>' +
         '<span class="tag" id="tag" hidden></span><span class="timer" id="timer">0:00</span></div>' +
-      '<div class="progress" aria-hidden="true"><span id="prog"></span></div>' +
-      '<div class="chat" id="chat" aria-live="polite"></div>' +
+      '<div class="chap"><div class="segs" id="segs" aria-hidden="true">' + new Array(CHAPTERS + 1).join('<span></span>') + '</div>' +
+        '<span class="label" id="kicker"></span></div>' +
+      '<div class="story" id="chat" aria-live="polite"></div>' +
       '<div class="actions" id="actions"></div>' +
     '</section>' +
     '<section class="view end" id="v-end" hidden>' +
@@ -219,7 +220,6 @@
   function setTag() {
     var tag = $('tag');
     if (state.phase === 'bird') { tag.textContent = t('tagGo'); tag.classList.add('go'); tag.hidden = false; }
-    else if (state.chapter > 0) { tag.textContent = state.chapter + '/' + CHAPTERS + ' · ' + t('ch' + state.chapter); tag.classList.remove('go'); tag.hidden = false; }
     else tag.hidden = true;
   }
   function applyStatic() {
@@ -229,7 +229,7 @@
     document.querySelectorAll('[data-i18n-aria]').forEach(function (el) { el.setAttribute('aria-label', t(el.getAttribute('data-i18n-aria'))); });
     document.querySelectorAll('[data-i18n-alt]').forEach(function (el) { el.setAttribute('alt', t(el.getAttribute('data-i18n-alt'))); });
     document.querySelectorAll('[data-lang]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-lang') === lang)); });
-    setTag();
+    setTag(); setKicker();
   }
   function setLang(l) {
     if (l === lang) return;
@@ -246,9 +246,17 @@
       li.classList.toggle('on', s === n); li.classList.toggle('done', s < n);
     });
   }
+  function setKicker() {
+    var n = state.chapter;
+    $('kicker').textContent = n ? t('chapter') + ' ' + n + ' / ' + CHAPTERS + ' · ' + t('ch' + n) : t('intro');
+    document.querySelectorAll('#segs span').forEach(function (sp, i) {
+      sp.className = i < n - 1 ? 'done' : i === n - 1 ? 'cur' : '';
+    });
+  }
+  // Nouveau chapitre = nouvelle page : on efface le texte du chapitre précédent.
   function setChapter(n) {
-    state.chapter = n; setTag();
-    $('prog').style.width = (n / CHAPTERS * 100) + '%';
+    state.chapter = n; state.log = []; chat.innerHTML = ''; chat.scrollTop = 0;
+    setTag(); setKicker();
   }
 
   /* ================= Tableau : zoom, cercles, touches ================= */
@@ -281,23 +289,27 @@
     frame.appendChild(rp); setTimeout(function () { rp.remove(); }, 700);
     var p = { x: fx, y: fy };
     if (dist(p, P.magpie.x, P.magpie.y) <= HIT_MAGPIE) { foundBird(); return; }
-    if (CROWS.some(function (c) { return dist(p, c[0], c[1]) <= HIT_CROW; })) { add('art', 'm_crow'); return; }
+    if (CROWS.some(function (c) { return dist(p, c[0], c[1]) <= HIT_CROW; })) { add('art', 'm_crow', 'fb'); return; }
     tries++;
     if (tries >= 3) ring(P.magpie, .12);
-    add('art', tries === 1 ? 'm_miss1' : tries === 2 ? 'm_miss2' : 'm_miss3');
+    add('art', tries === 1 ? 'm_miss1' : tries === 2 ? 'm_miss2' : 'm_miss3', 'fb');
   });
 
   /* ================= Dialogue ================= */
   function msgEl(entry) {
-    var m = document.createElement('div');
-    m.className = 'msg ' + (entry.type === 'art' ? 'art-says' : 'me') + (entry.cls ? ' ' + entry.cls : '');
-    if (entry.type === 'art') { var w = document.createElement('span'); w.className = 'who label'; w.textContent = t('who'); m.appendChild(w); }
-    m.appendChild(document.createTextNode(t(entry.key)));
+    var m = document.createElement('p');
+    m.className = (entry.type === 'art' ? 'para' : 'reply') + (entry.cls ? ' ' + entry.cls : '');
+    m.textContent = t(entry.key);
     return m;
   }
-  function scrollChat() { chat.scrollTop = chat.scrollHeight; }
+  function scrollChat() { chat.scrollTo ? chat.scrollTo({ top: chat.scrollHeight, behavior: 'smooth' }) : (chat.scrollTop = chat.scrollHeight); }
+  // cls 'fb' = réaction à un essai : elle remplace la réaction précédente au lieu de s'empiler.
   function add(type, key, cls) {
     var entry = { type: type, key: key, cls: cls || '' };
+    if (entry.cls === 'fb') {
+      state.log = state.log.filter(function (e) { return e.cls !== 'fb'; });
+      chat.querySelectorAll('.fb').forEach(function (el) { el.remove(); });
+    }
     state.log.push(entry); chat.appendChild(msgEl(entry)); scrollChat();
   }
   function renderChat() {
@@ -309,10 +321,11 @@
   function renderChoices() {
     actionsEl.innerHTML = '';
     state.choices.forEach(function (c) {
-      var b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.textContent = t(c[0]);
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = t(c[0]);
+      b.className = /^c_(go|next|time)$/.test(c[0]) ? 'chip primary' : 'chip';
       b.addEventListener('click', function () {
         state.choices = []; actionsEl.innerHTML = '';
-        if (c[0] !== 'c_next') add('me', c[0]);
+        if (!/^c_(go|next|time)$/.test(c[0])) add('me', c[0]);
         c[1]();
       });
       actionsEl.appendChild(b);
@@ -345,8 +358,7 @@
   function show(id) { state.view = id; ['v-scan', 'v-talk', 'v-end'].forEach(function (v) { $(v).hidden = v !== id; }); }
 
   function begin() {
-    show('v-talk'); setStep(1); startTimer(); loadHD(); setChapter(0);
-    chat.innerHTML = ''; state.log = []; choices([]);
+    show('v-talk'); setStep(1); startTimer(); loadHD(); setChapter(0); choices([]);
     say(['m_hello', 'm_series', 'm_secrets'], function () { choices([['c_go', chHunters]]); });
   }
   $('startBtn').addEventListener('click', begin);
@@ -376,6 +388,7 @@
     state.phase = 'story'; frame.classList.remove('tappable'); setStep(3); setTag();
     ring(P.magpie, .06, 4); zoomTo(P.magpie, 4);
     state.found.push('f_bird');
+    state.log = state.log.filter(function (e) { return e.cls !== 'fb'; }); chat.querySelectorAll('.fb').forEach(function (el) { el.remove(); });
     add('me', 'me_found', 'found');
     guard(wait(700).then(function () { say(['m_birdStory'], function () { next(chValley); }); }));
   }
